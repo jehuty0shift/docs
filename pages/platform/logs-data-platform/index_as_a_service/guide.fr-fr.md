@@ -6,7 +6,7 @@ excerpt: Use the power of Elasticsearch without managing a cluster.
 section: Features
 ---
 
-**Last updated 14th February 2020**
+**Last updated 22nd July 2020**
 
 ## Objective
 
@@ -16,7 +16,7 @@ Elasticsearch is one of the main components of the Logs Data Platform. It is one
 
 This is what you need to know to get you started:
 
-- You have ordered one of the Index Option.
+- You have created a [Logs Data Platform account](../quick_start/guide.fr-fr.md){.ref}
 - Your have access to the port 9200 of your cluster (head to the **Home** page in manager to know the address of your cluster).
 
 ## Instructions
@@ -25,21 +25,36 @@ This is what you need to know to get you started:
 
 #### Create an index
 
-To create an Elasticsearch index, you first need to order one with your active LDP (Logs Data Platform) account. This step can be done in the [OVH manager](https://www.ovh.com/manager/){.external}. Navigate to the **Home** page of the service and in the **Subscription** box, select the **edit** link in "Options" row to reach the dedicated page.
+There are two ways to create an Elasticsearch Index:
 
-![Plan and options menu](images/options_menu.png){.thumbnail}
+- Use the Logs Data Platform manager.
+- Use the Elasticsearch API. 
 
-On this page, you have the status of your current plan and options. You can then order an **index** with different sizes and number of **shards**. A **shard** is the main component of **index**. Multiple shards means more volume, more parallelism in your requests and thus more performance. We offer several choices of number of shards.
-
-Once purchased you can then go back to the main page and add a new index by clicking on the `Add a new index`{.action} on the Elasticsearch index section
+To create an Elasticsearch index with the Logs Data Platform manager, you need to go the index page and click on the `Add a new index`{.action} on the Elasticsearch index section
 
 ![add index option](images/add_index.png){.thumbnail}
 
-You must choose a suffix for your index that follows the `logs-<username>-i-<suffix>` naming convention. Optionally, you can also be notified when your index is close to its critical size. Once your index is created, you can use it right away.
+You must just choose a suffix for your index. the final name will follow this convention: `logs-<username>-i-<suffix>`. 
+For each index, you can specify the number of **shards**. A **shard** is the main component of **index**. Multiple shards means more volume, more parallelism in your requests and thus more performance. Optionally, you can also be notified when your index is close to its critical size. Once your index is created, you can use it right away.
+
+When you create a index through the [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-create-index.html){.external}, you can also specify the number of shards. Note that the maximum number of shards by index is limited to 16. Elasticsearch compatible tools can now create indices on the cluster as long as they follow the naming convention `logs-<username>-i-<suffix>`. Here is an exemple with a curl command with the user **logs-ab-12345** and the index **logs-ab-12345-i-another-index** on gra2 cluster. 
+
+```shell-session
+$ curl -u logs-ab-12345:mypassword -XPUT -H 'Content-Type: application/json' 'https://gra2.logs.ovh.com:9200/logs-ab-12345-i-another-index' -d '{ "settings" : {"number_of_shards" : 1}}'
+```
+
+- The **-u** option is followed by your LDP username that you can find on **Home** page. the password 'mypassword' follows it after the separator ':'
+- The **PUT** HTTP command can be used to create or modify a document.
+- The **-H 'Content-Type: application/json'** option is the mandatory header to indicate that the data will be in the json format.
+- The address contains the endpoint of the cluster followed by the **name of your index**
+- The payload of the request is a  **JSON document** which contains the [settings of your index](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-create-index.html#create-index-settings){.external}: the number of shards (the number of replicas will be automatically set at 1).
+
+Whatever method you use, you will be able to create an index to store, query and visualize your documents on Logs Data Platform. 
+
 
 #### Index some data
 
-Logs Data Platform Elasticsearch indices are compatible with the [Elasticsearch REST API](https://www.elastic.co/guide/en/elasticsearch/reference/6.7/docs.html){.external}. Therefore you can use simple http requests to index and search your data. The api is accessible behind a secured https endpoint with mandatory authentication. We recommend that you use [tokens](../tokens_logs_data_platform/guide.fr-fr.md){.ref} to authenticate yourself. You can retrieve the endpoint of the API at the **Home** page of your service. Here is a simple example to index a document with curl with an index on the cluster `graX.logs.ovh.com`.
+Logs Data Platform Elasticsearch indices are compatible with the [Elasticsearch REST API](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs.html){.external}. Therefore you can use simple http requests to index and search your data. The api is accessible behind a secured https endpoint with mandatory authentication. We recommend that you use [tokens](../tokens_logs_data_platform/guide.fr-fr.md){.ref} to authenticate yourself. You can retrieve the endpoint of the API at the **Home** page of your service. Here is a simple example to index a document with curl with an index on the cluster `graX.logs.ovh.com`.
 
 
 ```shell-session
@@ -49,6 +64,7 @@ $ curl -u <your-token-value>:token -XPUT -H 'Content-Type: application/json' 'ht
 Here is a quick explanation of this command:
 
 - The **PUT** HTTP command can be used to create or modify a document.
+- The 'Content-Type: application/json' is the mandatory header to indicate that the data will be in the json format.
 - The address contains the endpoint of the cluster followed by the **name of your index**
 - The **test** just after the index name is the type of the document.
 - The **1** here is the id of your document that can be any string.
@@ -82,7 +98,7 @@ $ curl -XGET -u <your-token-value>:token 'https://graX.logs.ovh.com:9200/logs-<u
 {"_id":"1","_index":"logs-<username>-i-<suffix>","_primary_term":1,"_seq_no":0,"_source":{"company":"OVH","message":"Hello World !","post_date":"1999-11-02T23:01:00","user":"Oles"},"_type":"_doc","_version":1,"found":true}
 ```
 
-To issue a simple search you can either use the [Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl.html){.external} or a [URI search.](https://www.elastic.co/guide/en/elasticsearch/reference/6.7/search-uri-request.html){.external}. Here is a simple example with an URI search:
+To issue a simple search you can either use the [Query DSL](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/query-dsl.html){.external} or a [URI search.](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-uri-request.html){.external}. Here is a simple example with an URI search:
 
 ```shell-session
 $ curl -XGET -u <your-token-value>:token 'https://graX.logs.ovh.com:9200/logs-<username>-i-<suffix>/_search?q=user:Oles'
@@ -397,9 +413,7 @@ This command will give you a document with the following format:
 ```
 
 The size in bytes used to compute your billing is the one under the following path:
-
 "indices" -> "logs-<username>-i-<suffix>" -> "primaries" -> "store" -> "size\_in\_bytes".
-
 
 
 ### Additional Information
@@ -413,9 +427,10 @@ Index as a service has some specificities on our platforms. This additional and 
 - You can create an **alias** on Logs Data Platform and attach it to one or several indices.
 - If there is a feature missing, feel free to contact us on the [community hub](https://community.ovh.com/c/platform/data-platforms-lab){.external} or on the mailing list.
 
+
 ## Go further
 
 - Getting Started: [Quick Start](../quick_start/guide.fr-fr.md){.ref}
 - Documentation: [Guides](../product.fr-fr.md){.ref}
-- Community hub: [https://community.ovh.com](https://community.ovh.com/c/platform/data-platforms){.external}
-- Create an account: [Try it free!](https://www.ovh.com/fr/order/express/#/new/express/resume?products=~%28~%28planCode~%27logs-basic~productId~%27logs%29){.external}
+- Community hub: [https://community.ovh.com](https://community.ovh.com/en/c/Platform){.external}
+- Create an account: [Try it!](https://www.ovh.com/fr/order/express/#/express/review?products=~(~(planCode~'logs-account~productId~'logs))){.external}
