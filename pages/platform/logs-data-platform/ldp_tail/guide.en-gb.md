@@ -6,7 +6,7 @@ excerpt: This super-powered tail will follow and format your logs with flying co
 section: Features
 ---
 
-**Last updated 2nd April 2019**
+**Last updated 22nd July 2020**
 
 ## Objective
 
@@ -18,7 +18,7 @@ The Logs Data Platform allows you to connect different applications or servers t
 
 - **ldp-tail** can be run on Linux, Mac or Windows, locally or remotely
 - You will need an internet connection
-- A LDP Pro account with [an active stream](../quick_start/guide.en-gb.md){ref} and WebSocket option enabled
+- A LDP account with [an active stream](../quick_start/guide.en-gb.md){ref} and WebSocket option enabled
 
 ## Instructions
 
@@ -151,7 +151,7 @@ If you have any difficulty understanding this pattern or if you want help creati
 
 It's also possible to replay a given time window in the past.
 
-To proceed, give the begin & end as uri query parameter.
+To proceed, give the begin & end as uri query parameter. begin and end must be in [Unix timestamp format](https://en.wikipedia.org/wiki/Unix_time){.external}. 
 
 Sample:
 
@@ -167,4 +167,4 @@ To make the magic happens, replace begin and end values with timestamps that hav
 - Getting Started: [Quick Start](../quick_start/guide.en-gb.md){.ref}
 - Documentation: [Guides](../product.en-gb.md){.ref}
 - Community hub: [https://community.ovh.com](https://community.ovh.com/en/c/Platform){.external}
-- Create an account: [Try it free!](https://www.ovh.com/fr/order/express/#/new/express/resume?products=~%28~%28planCode~%27logs-basic~productId~%27logs%29){.external}
+- Create an account: [Try it!](https://www.ovh.com/fr/order/express/#/express/review?products=~(~(planCode~'logs-account~productId~'logs)){.external}
