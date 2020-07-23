@@ -31,6 +31,7 @@ On this page you will find the long-term storage toggle. Once enabled, you will 
 - The activation of the notification for each new archive available.
 
 Note that OVH Object Storage is more expensive than OVH Public Archive but allow you to immediately download your archive whereas there is a delay (from 10 minutes to 4h) before being able to download your files on Public Archive. Depending or the urgency of your futures logs retrieval, you will have to choose your backend accordingly. 
+
 The content of your archive is flexible. By default, you get the full log content in GELF format. But you can choose to have an archive containing only the value of the custom LDP field X-OVH-TO-FREEZE. This field can for exemple be use to keep your logs in a human readable or original format. You can also choose to have two archives simultaneously: the original GELF and the X-OVH-TO-FREEZE archives. 
 
 ![Edit menu](images/edit-1.png){.thumbnail}
