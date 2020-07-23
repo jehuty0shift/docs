@@ -6,7 +6,7 @@ excerpt: If you want to give access to your logs to a software or automatize som
 section: Features 
 ---
 
-**Last updated 2nd April, 2019**
+**Last updated 23rd july, 2020**
 
 ## Objective
 
@@ -38,7 +38,7 @@ On this page you will have the possibility to create a token and to remove them.
 
 ![token generation](images/token_generation.png){.thumbnail}
 
-Once the token is created, you can use its value and remove it:
+Once the token is created, you can use its value or remove it:
 
 ![token generated](images/token_generated.png){.thumbnail}
 
@@ -189,7 +189,7 @@ For example to issue a search against the Graylog API with the token obtained ab
 
 
 ```shell-session
-$ curl -u kujg9g227qv0123mav3s0q4pra4psqsi5leka6j7lc62qdef58q:token -XGET "https://<your_cluster>.logs.ovh.com/api/search/universal/relative?query=*&range=2592000&filter=streams:a123aebc12345623aafd"
+$ curl -u kujg9g227qv0123mav3s0q4pra4psqsi5leka6j7lc62qdef58q:token -XGET "https://<your_cluster>.logs.ovh.com/api/search/universal/relative?query=*&range=300&filter=streams:a123aebc12345623aafd"
 ```
 
 Note that you have to replace the stream value in the filter parameter by the Id of your stream.
@@ -197,7 +197,7 @@ Note that you have to replace the stream value in the filter parameter by the Id
 To issue a search against the Elasticsearch API, you also use the same credentials.
 
 ```shell-session
-$ curl -u kujg9g227qv0123mav3s0q4pra4psqsi5leka6j7lc62qdef58q:token "https://<your_cluster>.logs.ovh.com:9200/<your_alias>/_search"
+$ curl -u kujg9g227qv0123mav3s0q4pra4psqsi5leka6j7lc62qdef58q:token "https://<your_cluster>.logs.ovh.com:9200/your_alias/_search?pretty"
 ```
 
 This call will launch a quick search (to retrieve the count and a sample of your documents) against the alias **your_alias**. Replace the alias by the one you have setup in you Logs Data Platform console. Note that these credentials are usable in place of your account credentials in Kibana and Grafana (or any tool that support Basic Authentication with Elasticsearch).
@@ -208,5 +208,6 @@ The only place you cannot use your token is the Graylog Web Interface.
 
 - Getting Started: [Quick Start](../quick_start/guide.fr-fr.md){.ref}
 - Documentation: [Guides](../product.fr-fr.md){.ref}
-- Community hub: [https://community.ovh.com](https://community.ovh.com/c/platform/data-platforms){.external}
-- Create an account: [Try it free!](https://www.ovh.com/fr/order/express/#/new/express/resume?products=~%28~%28planCode~%27logs-basic~productId~%27logs%29){.external}
+- Community hub: [https://community.ovh.com](https://community.ovh.com/en/c/Platform){.external}
+- Create an account: [Try it!](https://www.ovh.com/fr/order/express/#/express/review?products=~(~(planCode~'logs-account~productId~'logs)){.external}
+
