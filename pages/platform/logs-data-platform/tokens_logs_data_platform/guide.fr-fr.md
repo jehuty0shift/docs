@@ -14,9 +14,9 @@ With Logs Data Platform, there are 3 ways to query your logs.
 
 - The [Graylog Web Interface](https://gra1.logs.ovh.com){.external}
 - The [Graylog API](https://gra1.logs.ovh.com/api/api-browser#!/Search/Relative){.external}
-- The [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html){.external} located at the port 9200 of your cluster (find its address in the **Home** Page) against your [alias](../using_kibana_with_logs/guide.fr-fr.md){.ref}.
+- The [Elasticsearch API](https://www.elastic.co/guide/en/elasticsearch/reference/current/search.html){.external} located at the port 9200 of your cluster (find its address in the **Home** Page) against your [alias](../using_kibana_with_logs/guide.g.md){.ref}.
  
-So you can pop up a [Kibana](../using_kibana_with_logs/guide.fr-fr.md){.ref} or a [Grafana](../using_grafana_with_logs/guide.fr-fr.md){.ref} or even [a terminal Dashboard for Graylog](https://github.com/Graylog2/cli-dashboard){.external}.
+So you can pop up a [Kibana](../using_kibana_with_logs/guide.g.md){.ref} or a [Grafana](../using_grafana_with_logs/guide.en-gb.md){.ref} or even [a terminal Dashboard for Graylog](https://github.com/Graylog2/cli-dashboard){.external}.
 
 All these accesses are secured by your username and password. But what if you don't want to put your Logs Data Platform credentials everywhere? You can just use tokens to access all these endpoints and revoke them anytime you want. This tutorial is here to tell you how.
 
@@ -192,7 +192,15 @@ For example to issue a search against the Graylog API with the token obtained ab
 $ curl -u kujg9g227qv0123mav3s0q4pra4psqsi5leka6j7lc62qdef58q:token -XGET "https://<your_cluster>.logs.ovh.com/api/search/universal/relative?query=*&range=300&filter=streams:a123aebc12345623aafd"
 ```
 
-Note that you have to replace the stream value in the filter parameter by the Id of your stream.
+Note that you have to replace the stream value in the filter parameter by the Graylog Id of your stream. The Graylog id can be found in the URL of your stram search page in Graylog. 
+This URL has this form: 
+
+```
+https://gra2.logs.ovh.com/streams/5ab52dc43ce3010451deacd1/search
+```
+
+The value **5ab52dc43ce3010451deacd1** is the Graylog Id of your stream. 
+
 
 To issue a search against the Elasticsearch API, you also use the same credentials.
 
@@ -206,8 +214,8 @@ The only place you cannot use your token is the Graylog Web Interface.
 
 ## Go further
 
-- Getting Started: [Quick Start](../quick_start/guide.fr-fr.md){.ref}
-- Documentation: [Guides](../product.fr-fr.md){.ref}
+- Getting Started: [Quick Start](../quick_start/guide.g.md){.ref}
+- Documentation: [Guides](../product.g.md){.ref}
 - Community hub: [https://community.ovh.com](https://community.ovh.com/en/c/Platform){.external}
 - Create an account: [Try it!](https://www.ovh.com/fr/order/express/#/express/review?products=~(~(planCode~'logs-account~productId~'logs)){.external}
 
