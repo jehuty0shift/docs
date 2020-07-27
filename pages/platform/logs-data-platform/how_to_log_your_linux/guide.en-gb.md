@@ -5,7 +5,7 @@ order: 02
 section: Use cases
 ---
 
-**Last updated 10th April, 2019**
+**Last updated 27th July, 2020**
 
 ## Objective
  
@@ -186,4 +186,4 @@ The best feature is to mix criteria, based on what is important to you. For exam
 - Getting Started: [Quick Start](../quick_start/guide.en-gb.md){.ref}
 - Documentation: [Guides](../product.en-gb.md){.ref}
 - Community hub: [https://community.ovh.com](https://community.ovh.com/en/c/Platform){.external}
-- Create an account: [Try it free!](https://www.ovh.com/fr/order/express/#/new/express/resume?products=~%28~%28planCode~%27logs-basic~productId~%27logs%29){.external}
+- Create an account: [Try it!](https://www.ovh.com/fr/order/express/#/express/review?products=~(~(planCode~'logs-account~productId~'logs)){.external}
