@@ -5,7 +5,7 @@ order: 06
 section: Use cases
 ---
 
-**Last updated 10th April, 2019**
+**Last updated 27th July, 2020**
 
 ## Objective
 
@@ -15,7 +15,7 @@ At OVH, we love Microsoft products too. So it is important for us to provide you
 
 For this tutorial you will need to have completed the following steps :
 
-- [Activated your Logs Data Platform account.](https://www.ovh.com/fr/order/express/#/new/express/resume?products=~%28~%28planCode~%27logs-basic~productId~%27logs%29){.external}
+- [Activated your Logs Data Platform account.](https://www.ovh.com/fr/order/express/#/express/review?products=~(~(planCode~'logs-account~productId~'logs)){.external}
 - [To create at least one Stream and get its token.](../quick_start/guide.fr-fr.md){.ref}
 
 ## NXLog
@@ -119,5 +119,5 @@ If you want to go further, don't hesitate to fly to the [NXlog documentation](ht
 
 - Getting Started: [Quick Start](../quick_start/guide.fr-fr.md){.ref}
 - Documentation: [Guides](../product.fr-fr.md){.ref}
-- Community hub: [https://community.ovh.com](https://community.ovh.com/c/platform/data-platforms){.external}
-- Create an account: [Try it free!](https://www.ovh.com/fr/order/express/#/new/express/resume?products=~%28~%28planCode~%27logs-basic~productId~%27logs%29){.external}
+- Community hub: [https://community.ovh.com](https://community.ovh.com/en/c/Platform){.external}
+- Create an account: [Try it!](https://www.ovh.com/fr/order/express/#/express/review?products=~(~(planCode~'logs-account~productId~'logs)){.external}

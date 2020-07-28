@@ -43,13 +43,9 @@ When you create a index through the [Elasticsearch API](https://www.elastic.co/g
 $ curl -u logs-ab-12345:mypassword -XPUT -H 'Content-Type: application/json' 'https://gra2.logs.ovh.com:9200/logs-ab-12345-i-another-index' -d '{ "settings" : {"number_of_shards" : 1}}'
 ```
 
-- The **-u** option is followed by your LDP username that you can find on **Home** page. the password 'mypassword' follows it after the separator ':'
-- The **PUT** HTTP command can be used to create or modify a document.
-- The **-H 'Content-Type: application/json'** option is the mandatory header to indicate that the data will be in the json format.
-- The address contains the endpoint of the cluster followed by the **name of your index**
-- The payload of the request is a  **JSON document** which contains the [settings of your index](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-create-index.html#create-index-settings){.external}: the number of shards (the number of replicas will be automatically set at 1).
+There is more information about the API Support at the [dedicated section](#management-through-elasticsearch-api){.ref}.
 
-Whatever method you use, you will be able to create an index to store, query and visualize your documents on Logs Data Platform. 
+Whatever method you use, you will be able to query and visualize your documents on Logs Data Platform using the API. 
 
 
 #### Index some data
@@ -416,6 +412,95 @@ The size in bytes used to compute your billing is the one under the following pa
 "indices" -> "logs-<username>-i-<suffix>" -> "primaries" -> "store" -> "size\_in\_bytes".
 
 
+### Management through Elasticsearch API 
+
+
+On Logs Data Platform, we allow users to use Elasticsearch API to handle the lifecycle of their indices. You can create and delete indices directly with the Elasticsearch API. You can also create aliases and them. We even support templates to allow users to create their mapping a the creation of the index automatically !
+
+
+#### Index creation and deletion 
+
+To create an index on Logs Data Platform, use the following call:
+
+```shell-session
+$ curl -u <username>:<password> -XPUT -H 'Content-Type: application/json' 'https://gra2.logs.ovh.com:9200/<username>-i-<suffix>' -d '{ "settings" : {"number_of_shards" : 1}}'
+```
+
+- The **-u** option is followed by your LDP username that you can find on **Home** page. the password 'mypassword' follows it after the separator ':'
+- The **PUT** HTTP command can be used to create or modify a document.
+- The **-H 'Content-Type: application/json'** option is the mandatory header to indicate that the data will be in the json format.
+- The address contains the endpoint of the cluster followed by the **name of your index**
+- The payload of the request is a  **JSON document** which contains the [settings of your index](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/indices-create-index.html#create-index-settings){.external}: the number of shards (the number of replicas will be automatically set at 1).
+
+You have to follow the Logs Data Platform naming convention `<username>-i-<your-suffix>` to create your index. your username, is the one you use to connect to Graylog or to use the API. The suffix can contain any alphanumeric character. 
+
+To delete a index use the following call: 
+
+```shell-session
+$ curl -u <username>:<password> -XDELETE -H 'Content-Type: application/json' 'https://gra2.logs.ovh.com:9200/<username>-i-<suffix>'
+```
+
+Here we use the **DELETE** HTTP command to delete the index. 
+
+#### Alias creation and deletion
+
+Similarly than indices, you can use the API Calls to delete and create aliases on your indices. The only difference is the convention for the name of your alias. Your alias must be formatted as the following **`<username>-a-<suffix>`**. Here is an exemple call :
+
+```shell-session 
+$ curl -u <username>:<password> -XPUT -H 'Content-Type: application/json' 'https://gra2.logs.ovh.com:9200/<username>-i-<suffix>/_alias/<username>-a-<alias_suffix>'
+```
+
+This call create a individual alias on one index you have previously created. 
+
+You can also use the generic aliases call to create aliases:
+
+```shell-session 
+$ curl -XPOST "https://gra2.logs.ovh.com:9200/_aliases?pretty" -H 'Content-Type: application/json' -d'
+{
+    "actions" : [
+        { "remove" : { "index" : "<username>-i-<one-suffix>", "alias" : "<username>-a-<suffix>" } },
+        { "add" : { "index" : "<username>-i-<other-suffix>", "alias" : "<username>-a-<suffix>" } },
+	{ "remove_index": { "index": "<username>-i-<one-suffix>" } }
+    ]
+}'
+```
+
+All the actions (alias change, alias creation and index deletion) will be done in a single call. All the indices and aliases involved must follow the convention, otherwise an error will be thrown. 
+
+#### Templates
+
+Logs Data Platform supports your custom templates. As for indices and aliases, the template must follow some rules in order for them to work: 
+
+- the template name must contain your **`<username>`** inside the name. It can be anywhere in the name string. 
+- The prefix of the indices involved in the template MUST start by **`<username>-i-`**, the "\*" character must be after this prefix
+- The alias attached to your template must follow the usual convention: **`<username>-a-<suffix>`**
+
+Here is an exemple of a template for a user **logs-ab-12345**: 
+
+```shell-session
+$ curl -u <username>:<password> -XPUT -H 'Content-Type: application/json' 'https://gra2.logs.ovh.com:9200/_template/template_for_logs-ab-12345_indices' -d '
+{
+	"index_patterns" : [ "logs-ab-12345-i-debug*","logs-ab-12345-i-test*"  ],
+	"settings": { 
+		"number_of_shards" : 1,
+		},
+	"aliases" : {
+		"logs-ab-12345-a-all" : {},
+		"logs-ab-12345-a-debug" : { "filter" : { "term" : { "type" : "debug" } } }
+	}
+}'
+```
+
+This template will be applied for every new index matching the index pattern.
+
+#### Manager
+
+All the items you create through Elasticsearch API will be displayed in your manager and can be deleted or monitored through it. 
+
+![manager](images/manager.png){.thumbnail}
+
+Here the first index was create through API, its descrpition was filled automatically. 
+ 
 ### Additional Information
 
 Index as a service has some specificities on our platforms. This additional and technical information can help you to use it properly:
@@ -425,6 +510,7 @@ Index as a service has some specificities on our platforms. This additional and 
 - The **index_refresh_interval** of the index is set at 1 second ensuring near real time search results.
 - You are not allowed to change the settings of your index.
 - You can create an **alias** on Logs Data Platform and attach it to one or several indices.
+- Unlike indices, aliases are **read-only**, you cannot write through an alias yet.
 - If there is a feature missing, feel free to contact us on the [community hub](https://community.ovh.com/c/platform/data-platforms-lab){.external} or on the mailing list.
 
 

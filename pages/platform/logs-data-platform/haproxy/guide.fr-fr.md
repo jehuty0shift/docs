@@ -340,6 +340,9 @@ output.elasticsearch:
 
 In this configuration you have to replace the token by your X-OVH-TOKEN value of your destination stream. Note that you also got to indicate the username and password or your [token](../tokens_logs_data_platform/guide.fr-fr.md){.ref}. Don't change the destination index **ldp-logs**. Start your filebeat and head to Logs Data Platform to start analyzing your logs. 
 
+```shell-session
+$ sudo systemctl enable filebeat
+$ sudo systemctl start filebeat
 
 ### Dashboard and alerts
 
