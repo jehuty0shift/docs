@@ -40,20 +40,19 @@ At the top of the page, you can see the configuration menu of the two main items
 
 Below them, you have access to different sections :
 
-3. The **Data-gathering tools** tab will allow you to ask OVH to host your own dedicated collector like Logstash or Flowgger.
-4. The **Index** tab will allow you to create your dedicated Elasticsearch Index or retrieve the ones used to store your Kibana settings.
-5. The **Aliases** tab will allow you to access your data directly from your Kibana or using an Elasticsearch query.
-6. The **Kibana** tab will allow you to create your personal Kibana Instance so you can exploit your aliases and index in the powerful Kibana interface. 
-7. The **Users Roles** will give you the control over who can read and access your streams or dashboard.
+3. The **Data-gathering tools** tab, allows requesting OVH to host your own dedicated collector like Logstash or Flowgger.
+4. The **Index** tab, allows creating your dedicated Elasticsearch Index or retrieve the ones used to store your Kibana settings.
+5. The **Aliases** tab, provides access to your data directly from your Kibana or using an Elasticsearch query.
+6. The **Kibana** tab, creates your personal Kibana Instance, in order to exploit the aliases and index from the powerful Kibana interface. 
+7. The **Users Roles**, allows access rights modification of your streams or dashboard.
 
 ### Let's send some logs!
 
-- The first step to use the Logs Data Platform is to create a stream and to get your token. Creating a stream is simple: click on the link  **Add data stream**  in the data stream panel. It will then redirect you to a page where you can add a name and a description to your stream:
+- Firstly create a stream in order to get your token using:  **Add data stream**  in the data stream panel, you shall be redirected to the page where one can add a name and a description to the stream:
 
 ![new Stream](images/newStream.png){.thumbnail}
 
-
-It's also on this page where you can enable the live-tail websocket feature, enable the indexation your logs to explore them in Graylog, choose the retention of the data in this stream, limit the amount of logs stored in this stream to control your budget. 
+On the same page you can enable the live-tail websocket feature, enabling the indexation of your logs to explore them in Graylog, choose the retention of the data in this stream, limit the amount of logs stored in this stream to control your budget. 
 
 - Once you have done this, click on the blue button  **Save**  and that's it! You have created your first stream. The button will redirect you to the stream page where you will be able to copy the X-OVH-TOKEN token. This value is the only token you will need to route logs to your stream. Under this token, you will have a list of your created streams.
 
@@ -73,9 +72,9 @@ Logs Data Platform supports several logs formats, each one of them has its own a
 
 - **GELF**: This is the native format of logs used by Graylog. This JSON format will allow you to send logs really easily. See: [http://docs.graylog.org/en/latest/pages/gelf.html](http://docs.graylog.org/en/latest/pages/gelf.html){.external}. The GELF input only accept a null ('') delimiter.
 - **LTSV**: this simple format is very efficient and is still human readable. you can learn more about it [here](http://ltsv.org){.external}. LTSV has two inputs that accept a line delimiter or a null delimiter.
-- **RFC 5424**: This format is one of the most commonly used by logs utility like syslog. It is extensible enough to allow you to send all your data. More information about it can be found at this link: [RFC
+- **RFC 5424**: This format is commonly used by logs utility such as syslog. It is extensible enough to allow you to send all your data. More information about it can be found at this link: [RFC
 5424](https://tools.ietf.org/html/rfc5424){.external}.
-- **Cap'n'Proto**: The most efficient log format. this is a binary format that will allows you to maintain a low footprint and high speed performance. If you want to know more about it, check the official website: [Cap'n'Proto](https://capnproto.org/){.external}.
+- **Cap'n'Proto**: The most efficient log format. this is a binary format that allows you to maintain a low footprint and high speed performance. For more information, check out the official website: [Cap'n'Proto](https://capnproto.org/){.external}.
 - **Beats**: A secure and reliable protocol used by the beats family in the Elasticsearch ecosystem (Ex: [Filebeat](../filebeat_logs/guide.fr-fr.md){.ref}, [Metricbeat](https://www.elastic.co/beats/metricbeat){.external}, [Winlogbeat](https://www.elastic.co/beats/winlogbeat){.external}).
 
 Here are the ports you can use on your cluster to send your logs. You can either use the secured ones with SSL Enabled (TLS >= 1.1) or use the plain unsecured ones if you can't use a SSL transport.
@@ -142,15 +141,15 @@ some_metric_num:42
 
 Press `Enter`{.action} or click on the Green button to launch the search and wait for your results.
 
-You can also search some part of your message by entering:
+It's possible to search some part of your message by entering:
 
 ```
 helps going
 ```
 
-It will give you all the messages that contains the terms 'helps' and 'going'.
+Giving you all the messages that contains the terms 'helps' and 'going'.
 
-Graylog allows you to extensively search through your logs without compromising usability. If you want to know more about how to craft relevant searches on Graylog, head to [Graylog Search Documentation](http://docs.graylog.org/en/2.0/pages/queries.html){.external}.
+Graylog allows you to extensively search through your logs without compromising usability. For more information about how to craft relevant searches on Graylog, please visit [Graylog Search Documentation](http://docs.graylog.org/en/2.0/pages/queries.html){.external}.
 
 Send several logs with different values for user_id, for example. At the left of the page you will see the fields present in your stream, you can click on the user_id checkbox to display all the values for this field along the logs.
 
@@ -163,7 +162,7 @@ Let's go back to the Logs Data Platform manager, we will now create a Dashboard 
 
 At first, your dashboard is sad and empty but we will fill it really soon with some awesome widgets ;-). To do that, get back to your stream: you can use the link on graylog (under the Stream tab) or the link on your console as you wish. Let's say you want all the user Ids for which the value some_metric is above 30, first. you search for this data:
 
-- in the search bar, enter this: `some_metric_num:>30`
+- in the search bar, enter the following: `some_metric_num:>30`
 - select above the search bar, the relative range of time you want to use in your widgets. If you want your widget to display the value for the last hour, select "Search in the last Hour".
 - On the left panel, unroll the user_id menu (by clicking on the blue triangle at the left) and select Quick Values. It will then display a nice widget with the distribution of the most frequent user_ids.
 
@@ -182,7 +181,7 @@ Mixing various widgets on the same dashboard give to this feature all its sense.
 ![critical Dashboard 2](images/critical-dashboard-2.png)
 
 
-## Go further
+## Going further
 We have only scratched the surface of what Logs Data Platform can do for you. you will find soon enough how to:
 
 - [Send correctly formatted logs to use custom types as number, boolean and other stuffs](../field_naming_conventions/guide.fr-fr.md){.ref}
