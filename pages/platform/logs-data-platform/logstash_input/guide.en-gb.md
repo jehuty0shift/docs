@@ -9,33 +9,33 @@ section: Features
 
 ## Objective
 
-[Logstash](https://github.com/elastic/logstash){.external} is an open source software developed by Elastic and allows you to send messages from different inputs to different types of output using different codecs, while processing them and transforming them in the process. You can learn a lot more about it on [the official website](https://www.elastic.co/products/logstash){.external}.
+[Logstash](https://github.com/elastic/logstash){.external} is an open source software developed by Elastic. Based on its features, its possible to send messages from several inputs to different types of output using a variety of codecs, while processing them and transforming them in the process. You can learn a lot more about it on [the official website](https://www.elastic.co/products/logstash){.external}.
 
-This guide will show you how to deploy your personal Logstash with your own configuration to send your logs from any source to your stream directly on the Logs Data Platform.
+This guide will demonstrate how to deploy a personalized Logstash having a specific configuration, and send logs from any source to your stream directly on the Logs Data Platform.
 
 ## Requirements
 
-If you are new to Logs Data Platform, you will have to complete this [Quick Start Tutorial](../quick_start/guide.en-gb.md){.ref}
+If you are new to Logs Data Platform, completion of the [Quick Start Tutorial](../quick_start/guide.en-gb.md){.ref} is highly recommended.
 
-This is a rather long document but if you are already familiar with Logstash you can jump to the parts you're interested in :
+The following links can help you get a headstart on Logstash in order to get started with the basics:
 
 - [What is Logstash?](#what-is-logstash){.external}
 - [How do I configure Logstash Collector on Logs Data Platform?](#host-a-logstash-collector-on-logs-data-platform){.external}
 - [What is special about our hosted Logstash? Available plugins, SSL Certificates and more.](#additional-information_1){.external}
 
-This is "All you have to know about the Logstash Collector on the Logs Data Platform"!
+This is "All you need to know about the Logstash Collector on the Logs Data Platform"!
 
 ## Instructions
 
 ### What is Logstash
 
-Logstash is mainly a processing pipeline of data that allows you to get or receive information from a lot of sources and transform them if necessary before sending them to different types of software. In a configuration file you have 3 main parts to configure:
+Logstash is a data processing pipeline that allows you to receive information from several sources, transforming them if necessary before sending to a variety of softwares. In the configuration file there are three main parts to configure:
 
-- The Input part: This part details where your logs come from. Some inputs wait for logs and some inputs are able to fetch them from a database for example.
-- The Filter part: This part details how Logstash should parse and transform your logs messages.
-- The Output part: This part specifies in which format to send logs and where to send them.
+- The Input part: details where your logs come from. For instance, some inputs may wait for logs and in some cases inputs are able to fetch them from a database.
+- The Filter part: details how Logstash should parse and transform your logs messages.
+- The Output part: specifies the format and their destination.
 
-Here is a small configuration file so you get an idea :
+Following is a small configuration file for familiarizing yourself with the idea :
 
 ```ruby
  #input
