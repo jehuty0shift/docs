@@ -11,9 +11,8 @@ section: Features
 
 ## Overview 
 
-Logs policies are often decisions taken by an entire team not individuals. When we designed Logs Data Platform we put collaboration 
-as one of the most important features. We think by making Logs Data Platform a collaborative platform, it will help you to share your data in a easy and safe manner. 
-Log policies also affect entire teams on their access rights. Product managers could access some data but be denied to access security logs for example. That's why we choosed to provide a [Role Based Access Control](https://en.wikipedia.org/wiki/Role-based_access_control){.external) to users to configure access rights. This document will expose you how you can use this system to configure access rights. 
+Logs policies are often decisions taken by an entire team not individuals.Collaboration remains an utmost priority for Logs Data Platform, following this strategy it shall enable everyone share data in a easy and secure manner. 
+Log policies also affect sevral teams regarding access rights, for instance the Product managers can access some data but be denied to access security logs. That's why we decided to provide a [Role Based Access Control](https://en.wikipedia.org/wiki/Role-based_access_control){.external) to users to configure access rights. This document will expose you how you can use this system to configure access rights. 
 
 
 ## Creating a Role
@@ -57,7 +56,7 @@ Once a member has been added, he will see the relevant page the item that have b
 ![menu\_permission](images/shared_stream.png){.thumbnail}
 
 
-A user can access the shared items with his usual credentials whatever the cluster is. If he has access to items on another cluster, he will even be able to create tokens for this new cluster access. As a reminder, creating an account on Logs Data Platform is free, any OVHcloud nic-handle can create one or several accounts and they don't have to pay for data that have been shared to them. 
+A user can access the shared items with his usual credentials whatever the cluster is. If one has access to items on another cluster, it shall be possible to create tokens for this new cluster access. As a reminder, creating an account on Logs Data Platform is free, any OVHcloud nic-handle can create one or several accounts and they don't have to pay for data that have been shared to them. 
 
 
 ## Using API 
