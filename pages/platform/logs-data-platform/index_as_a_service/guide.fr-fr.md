@@ -10,7 +10,7 @@ section: Features
 
 ## Objective
 
-Elasticsearch is one of the main components of the Logs Data Platform. It is one of the most powerful search and analytics engines. From the outset we offered the possibility to host a Kibana index for your Kibana metadata. Index As A Service is the obvious next step of this functionality. You can now use a fully unlocked index for any purpose; complex documents, reports or even logs. Thanks to the Elasticsearch API, you will be able to use most of the tools of the ELK (Elasticsearch, Logstash, Kibana) Ecosystem.
+Elasticsearch is one of the main components of the Logs Data Platform, regarded as one of the most powerful search and analytics engines. From the outset we offered the possibility to host a Kibana index for your Kibana metadata, Index As A Service being the next step to this functionality. You can now use a fully unlocked index for almost any purpose; be it complex documents, reports or even logs. Thanks to the Elasticsearch API, you will be able to use most of the tools of the ELK (Elasticsearch, Logstash, Kibana) Ecosystem.
 
 ## Requirements
 
@@ -50,7 +50,7 @@ Whatever method you use, you will be able to query and visualize your documents 
 
 #### Index some data
 
-Logs Data Platform Elasticsearch indices are compatible with the [Elasticsearch REST API](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs.html){.external}. Therefore you can use simple http requests to index and search your data. The api is accessible behind a secured https endpoint with mandatory authentication. We recommend that you use [tokens](../tokens_logs_data_platform/guide.fr-fr.md){.ref} to authenticate yourself. You can retrieve the endpoint of the API at the **Home** page of your service. Here is a simple example to index a document with curl with an index on the cluster `graX.logs.ovh.com`.
+Logs Data Platform Elasticsearch indices are compatible with the [Elasticsearch REST API](https://www.elastic.co/guide/en/elasticsearch/reference/6.8/docs.html){.external}. Therefore, you can use simple http requests to index and search your data. The api is accessible behind a secured https endpoint with mandatory authentication. We recommend that you use [tokens](../tokens_logs_data_platform/guide.fr-fr.md){.ref} to authenticate yourself. You can retrieve the endpoint of the API at the **Home** page of your service. Here is a simple example to index a document with curl with an index on the cluster `graX.logs.ovh.com`.
 
 
 ```shell-session

@@ -11,9 +11,9 @@ section: Use cases
 
 [Filebeat](https://github.com/elastic/beats/tree/master/filebeat){.external} is an open source file harvester, used to fetch logs files and can be easily setup to feed them into Logs Data Platform.
 
-The main benefits of Filebeat are his very resilient protocol to send logs and his variety of modules ready-to-use for the most common applications.
+The main benefits of Filebeat are it's resilient protocol to send logs, and a variety of modules ready-to-use for the most common applications.
 
-This guide will describe how to setup Filebeat OSS on your system to forward your logs on Logs Data Platform. It will also present you with some configuration setup you can use to further structure your logs.
+This guide will describe how to setup Filebeat OSS on your system for forwarding your logs on Logs Data Platform. It will also present you with some configuration setup useful to further structure your logs.
 
 ## Requirements
 
@@ -264,13 +264,13 @@ Note the type value (apache or syslog or apache-error) that indicates the source
 
 ### Conclusion and useful resources
 
-Filebeat is a really useful tool to send the content of your current log files to Logs Data Platform. It offers a clean and easy way to send your logs without changing the configuration of your software. Don't hesitate to check the links below to master this tool.
+Filebeat is a handy tool to send the content of your current log files to Logs Data Platform. It offers a clean and easy way to send your logs without changing the configuration of your software. Don't hesitate to check the links below to master this tool.
 
 - Configuration's details: [https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-configuration-details.html](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-configuration-details.html){.external}
 - Getting started: [https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-getting-started.html](https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-getting-started.html){.external}
 - Learn how to configure Filebeat and Logstash to add your own extra filters: [All you have to know about the Logstash Collector on Logs Data Platform!](../logstash_input/guide.fr-fr.md){.ref}
 
-## Go further
+## Going further
 
 - Getting Started: [Quick Start](../quick_start/guide.fr-fr.md){.ref}
 - Documentation: [Guides](../product.fr-fr.md){.ref}

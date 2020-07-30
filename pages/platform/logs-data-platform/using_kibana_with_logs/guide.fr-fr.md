@@ -9,7 +9,7 @@ section: Visualize your logs
 
 ## Objective
 
-This guide will help you want to unleash the full power of [Kibana](https://github.com/elastic/kibana){.external} and craft some beautiful Dashboards from your logs.
+This guide will help you unleash the full power of [Kibana](https://github.com/elastic/kibana){.external} and craft some beautiful Dashboards from your logs.
 
 ## Requirements
 
