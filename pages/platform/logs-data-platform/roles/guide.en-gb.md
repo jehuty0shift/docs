@@ -12,7 +12,7 @@ section: Features
 ## Overview 
 
 Logs policies are often decisions taken by an entire team not individuals.Collaboration remains an utmost priority for Logs Data Platform, following this strategy it shall enable everyone share data in a easy and secure manner. 
-Log policies also affect sevral teams regarding access rights, for instance the Product managers can access some data but be denied to access security logs. That's why we decided to provide a [Role Based Access Control](https://en.wikipedia.org/wiki/Role-based_access_control){.external) to users to configure access rights. This document will expose you how you can use this system to configure access rights. 
+Log policies also affect sevral teams regarding access rights, for instance the Product managers can access some data but be denied to access security logs. That's why we decided to provide a [Role Based Access Control](https://en.wikipedia.org/wiki/Role-based_access_control){.external} to users to configure access rights. This document will expose you how you can use this system to configure access rights. 
 
 
 ## Creating a Role
