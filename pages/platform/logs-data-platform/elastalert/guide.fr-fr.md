@@ -10,7 +10,7 @@ section: Use cases
 
 ## Objective 
 
-[ElastAlert](https://github.com/Yelp/elastalert){.external} is an alerting framework designed by Yelp able to detect anomalies, spikes, or other patterns of interest. It is production-ready and is one of the standard of alerting in the Elasticsearch ecosystem. As stated in their documentation : "If you can see it in Kibana, ElastAlert can alert on it." In this document you will learn how to deploy this component on Logs Data Platform thanks to its compability with Elasticsearch through [aliases](../using_kibana_with_logs/guide.fr-fr.md){.ref} and [indexes](../index_as_a_service/guide.fr-fr.md){.ref}. Logs Data Platform also allows you to host ElastAlert meta-indices on Logs Data Platform.
+[ElastAlert](https://github.com/Yelp/elastalert){.external} is an alerting framework designed by Yelp able to detect anomalies, spikes, or other patterns of interest. It is production-ready and is one of the standard of alerting in the Elasticsearch ecosystem. As stated in their documentation : "If you can see it in Kibana, ElastAlert can alert on it." In this document you will learn how to deploy this component on Logs Data Platform thanks to its compability with Elasticsearch through [aliases](../using_kibana_with_logs/guide.fr-fr.md){.ref} and [indexes](../index_as_a_service/guide.fr-fr.md){.ref}. Logs Data Platform also allows you to host ElastAlert meta-indices on Logs Data Platform..
 
 ## Requirements 
 
@@ -136,7 +136,7 @@ You can find all the available options [here](https://elastalert.readthedocs.io/
 ### Rules configuration
 
 
-For the exemple, we will create a [frequency.yml](https://elastalert.readthedocs.io/en/latest/ruletypes.html#frequency){.external} rule which will send a email if the field **user** with the value **Oles** appears more than **3** times in less than **4hours** and send an **email**. 
+For the exemple, we will create a [frequency.yml](https://elastalert.readthedocs.io/en/latest/ruletypes.html#frequency){.external} rule which will send a email if the field **user** with the value **Oles** appears more than **3** times in less than **4hours** and send an **email**. If your machine cannot send an email, you can still test the rule (it will just fail at the sending).
 
 
 ```yaml
@@ -196,6 +196,15 @@ To launch ElastAlert, use the following command :
 ```shell-session
 $ elastalert --config config.yml
 ```
+
+To test your alert you can use the following curl command sending logs to our [Elasticsearch endpoint](../ldp_index/guide.fr-fr.md){.external}: 
+
+
+```shell-session
+$ curl -H 'Content-Type: application/json' -u '<username>:<password>' -XPOST https://<ldp-cluster>.logs.ovh.com:9200/ldp-logs/message -d '{ "X-OVH-TOKEN" : "wstream-token>" , "test_field" : "OVHcloud" , "user": "Oles", "short_message" : "Hello ES input", "host" : "OVHcloud_elastalert" }'
+```
+
+If you send more than 3 times this event, the elastalert process will try to send an alert at the email address configured. 
 
 ElastAlert has a lot of integrations for alerting including Email, JIRA, OpsGenie, SNS, HipChat, Slack, MS Teams, PagerDuty, Zabbix, custom commands and [many more](https://elastalert.readthedocs.io/en/latest/ruletypes.html#alerts){.external}. 
 
