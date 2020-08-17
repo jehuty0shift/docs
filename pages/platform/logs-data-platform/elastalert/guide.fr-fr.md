@@ -10,7 +10,7 @@ section: Use cases
 
 ## Objective 
 
-[ElastAlert](https://github.com/Yelp/elastalert){.external} is an alerting framework designed by Yelp able to detect anomalies, spikes, or other patterns of interest. It is production-ready and is one of the standard of alerting in the Elasticsearch ecosystem. As stated in their documentation : "If you can see it in Kibana, ElastAlert can alert on it." In this document you will learn how to deploy this component on Logs Data Platform thanks to its compability with Elasticsearch through [aliases](../using_kibana_with_logs/guide.fr-fr.md){.ref} and [indexes](../index_as_a_service/guide.fr-fr.md){.ref}. Logs Data Platform also allows you to host ElastAlert meta-indices on Logs Data Platform..
+[ElastAlert](https://github.com/Yelp/elastalert){.external} is an alerting framework designed by Yelp, able to detect anomalies, spikes, or other patterns of interest. It is production-ready and is one of the standard of alerting in the Elasticsearch ecosystem. As stated in their documentation : "If you can see it in Kibana, ElastAlert can alert on it." In this document you will learn how to deploy this component on Logs Data Platform thanks to its compability with Elasticsearch through [aliases](../using_kibana_with_logs/guide.fr-fr.md){.ref} and [indexes](../index_as_a_service/guide.fr-fr.md){.ref}. Logs Data Platform also allows you to host ElastAlert meta-indices on Logs Data Platform..
 
 ## Requirements 
 
