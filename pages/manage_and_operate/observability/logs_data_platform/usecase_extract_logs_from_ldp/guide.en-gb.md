@@ -1,26 +1,32 @@
 ---
 title: Extract your logs from Logs Data Platform
-excerpt: Export logs using Logstash (and other tools)
-updated: 2025-09-30
+excerpt: Export logs using Logstash or Fluent Bit
+updated: 2025-10-15
 ---
 
 ## Objective
 
-This guide explains how to **export logs stored in the Logs Data Platform (LDP)**.  
-It presents several methods to export logs through the OpenSearch API. 
+This guide explains how to **export logs stored in the Logs Data Platform (LDP)** using tooling that speaks the OpenSearch API.
+It presents two reference implementations:
+
+* **Logstash**, suited to long-running pipelines and complex transformations.
+* **Fluent Bit**, ideal for lightweight collectors and scheduled extractions.
 
 
 ## Requirements
 
 
-- you are already sending logs on a stream you own [see the quick start tutorial](/pages/manage_and_operate/observability/logs_data_platform/getting_started_quick_start)
-- you have access to the port 9200 of your cluster (head to the **Home** page in the Logs Data Platform section of OVHcloud control panel to know the address of your cluster)
+- You are already sending logs on a stream you own — [see the quick start tutorial](/pages/manage_and_operate/observability/logs_data_platform/getting_started_quick_start).
+- You know the OpenSearch endpoint of your LDP cluster (`https://<ldp-cluster>.logs.ovh.com:9200`).
+- Your host can reach TCP port **9200** on the cluster endpoint over TLS.
+- You have credentials for the alias you want to export (basic authentication or IAM bearer token).
+- You can install either **Logstash ≥ 8.0** or **Fluent Bit ≥ 2.1** on the host that will run the export.
 
 
 ## Introduction
 
-Exporting logs is a common need when you want to analyse data outside the LDP ecosystem, feed it to external BI tools. For archiving, we provide [another solution](/pages/manage_and_operate/observability/logs_data_platform/archive_cold_storage/).  
-We will explain how to use Logstash and fluent-bit to export logs. 
+Exporting logs is a common need when you want to analyse data outside the LDP ecosystem or feed it to external BI tools. For long-term archiving, we provide [another solution](/pages/manage_and_operate/observability/logs_data_platform/archive_cold_storage/).
+The next sections explain how to pull documents from your alias with **Logstash** or with **Fluent Bit**, letting you choose the tool that best fits your operational model.
 
 
 ## Alias naming conventions
@@ -133,12 +139,112 @@ bin/logstash -f config/pipeline.conf --config.reload.automatic
 
 Logstash will connect to the OpenSearch endpoint, read the documents that belong to the alias defined above, and write the selected fields to a daily CSV file under `/var/log/ldp/`.
 
+## Export logs with Fluent Bit
+
+### Prerequisites
+
+| Requirement | Details |
+|-------------|---------|
+| Fluent Bit ≥ 2.1 | Install on a Linux host or container with network access to the LDP endpoint. |
+| Network access | Allow outbound TCP connectivity to `<ldp-cluster>.logs.ovh.com` on port `9200`. |
+| Authentication | Use either basic auth credentials (legacy users) or an IAM bearer token. |
+| TLS trust store | Ensure the system trust store contains public Certificate Authorities, or provide a custom CA bundle. |
+| Alias name | The alias created earlier (e.g. `ldp-ti-98765-a-logs-export`). |
+
+### Install Fluent Bit locally
+
+```bash
+# Example for Debian/Ubuntu
+curl https://repos.fluentbit.io/fluentbit.key | sudo gpg --dearmor -o /usr/share/keyrings/fluentbit-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/fluentbit-archive-keyring.gpg] https://packages.fluentbit.io/ubuntu/$(lsb_release -sc) $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/fluentbit.list
+sudo apt update
+sudo apt install fluent-bit
+
+# Verify version
+fluent-bit --version
+```
+
+If you use a container image, ensure the container has access to `/etc/ssl/certs/` or mount a directory that contains trusted CAs to validate the OVHcloud certificate chain.
+
+### Fluent Bit configuration
+
+Create `/etc/fluent-bit/fluent-bit.conf` with the following content:
+
+```ini
+[SERVICE]
+    Flush        1
+    Grace        30
+    Log_Level    info
+    storage.path /var/lib/fluent-bit/
+
+[INPUT]
+    Name                elasticsearch
+    Host                <ldp-cluster>.logs.ovh.com
+    Port                9200
+    Index               <alias-name>
+    Query               {"query":{"bool":{"filter":[{"range":{"@timestamp":{"gte":"now-1d","lte":"now"}}}]}}}
+    Scroll              5m
+    Interval_Sec        300
+    tls                 On
+    tls.verify          On
+    tls.ca_file         /etc/ssl/certs/ca-certificates.crt
+    HTTP_User           <username>
+    HTTP_Passwd         <password>
+
+# --- Use this block instead of HTTP_User/HTTP_Passwd when authenticating with IAM ---
+#[INPUT]
+#    Name                elasticsearch
+#    Host                <ldp-cluster>.logs.ovh.com
+#    Port                9200
+#    Index               <alias-name>
+#    Query               {"query":{"match_all":{}}}
+#    Scroll              5m
+#    Interval_Sec        300
+#    tls                 On
+#    tls.verify          On
+#    Header              Authorization Bearer <iam-token>
+
+[OUTPUT]
+    Name        file
+    Match       *
+    Path        /var/log/ldp/
+    File        fluentbit-export
+    Format      json
+    Rotate_Wait 60
+    Total_File_Size 512M
+
+#[OUTPUT]
+#    Name        forward
+#    Match       *
+#    Host        <central-collector>
+#    Port        24224
+#    tls         On
+#    tls.verify  On
+```
+
+Start Fluent Bit with:
+
+```bash
+sudo systemctl restart fluent-bit
+# or run manually
+fluent-bit -c /etc/fluent-bit/fluent-bit.conf
+```
+
+### Understanding the key options
+
+- **Pagination (`Scroll`)**: The `Scroll` directive keeps a server-side cursor active for batch extraction. Keep it long enough (e.g. `5m`) to read all pages but short enough to release resources quickly.
+- **Query filters**: Adjust the `Query` JSON to limit the time range (`range` filter on `@timestamp`) or to apply additional `bool` conditions (e.g., `term` filters). Narrow queries reduce the number of documents and speed up exports.
+- **Interval scheduling**: `Interval_Sec` defines how often Fluent Bit will rerun the query. Align it with your retention policy (e.g., run every 5 minutes or once per day).
+- **Buffering and storage**: The `[SERVICE]` section enables filesystem buffering (`storage.path`). Tune `storage.backlog.mem_limit` and output-specific buffering options if you expect spikes in document volume.
+- **TLS verification**: Keep `tls.verify On` to ensure the connection validates the OVHcloud certificate chain. Only disable verification for troubleshooting and re-enable it afterward.
+- **Output routing**: The provided `[OUTPUT]` section writes newline-delimited JSON files and rotates them every 60 seconds or 512 MB. Replace or complement it with other plugins (`forward`, `http`, `kafka`, etc.) to relay the extracted documents to downstream systems.
+
 ## Next steps
 
-* **Add more fields** to the `fields` list to enrich the CSV export.  
-* **Enable compression** with `gzip => true` for large exports.  
-* **Combine with additional Logstash filters** (e.g., `grok`, `geoip`) to transform data before writing.  
-* **Alternative extraction method** – a second section will describe how to use the OpenSearch `_search` API together with a CSV exporter to achieve the same result without Logstash.
+* **Extend the Logstash pipeline** with additional filters (`grok`, `geoip`, `mutate`) or different outputs to match your analytics workflow.
+* **Adapt the Fluent Bit configuration** to forward data to a centralized collector (e.g., Fluentd, Kafka, HTTP) or to adjust the extraction schedule.
+* **Automate credential renewal** when using IAM bearer tokens by integrating with the OVHcloud IAM API and rotating tokens before they expire.
 
-For more details on the OpenSearch input plugin, see the official documentation: <https://docs.opensearch.org/latest/tools/logstash/read-from-opensearch/>.  
+For more details on the OpenSearch input plugin, see the official documentation: <https://docs.opensearch.org/latest/tools/logstash/read-from-opensearch/>.
 The CSV output plugin reference is available at: <https://www.elastic.co/guide/en/logstash/current/plugins-outputs-csv.html>.
+Fluent Bit configuration options are documented at: <https://docs.fluentbit.io/manual/pipeline/inputs/elasticsearch> and <https://docs.fluentbit.io/manual/pipeline/outputs>.
