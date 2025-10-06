@@ -1,7 +1,7 @@
 ---
 title: Extract your logs from Logs Data Platform
-excerpt: Export logs using Logstash or Fluent Bit
-updated: 2025-10-15
+excerpt: Export logs using Logstash or elasticdump
+updated: 2024-06-04
 ---
 
 ## Objective
@@ -10,7 +10,7 @@ This guide explains how to **export logs stored in the Logs Data Platform (LDP)*
 It presents two reference implementations:
 
 * **Logstash**, suited to long-running pipelines and complex transformations.
-* **Fluent Bit**, ideal for lightweight collectors and scheduled extractions.
+* **elasticdump**, a lightweight CLI utility designed for one-off or scheduled exports.
 
 
 ## Requirements
@@ -20,13 +20,13 @@ It presents two reference implementations:
 - You know the OpenSearch endpoint of your LDP cluster (`https://<ldp-cluster>.logs.ovh.com:9200`).
 - Your host can reach TCP port **9200** on the cluster endpoint over TLS.
 - You have credentials for the alias you want to export (basic authentication or IAM bearer token).
-- You can install either **Logstash ≥ 8.0** or **Fluent Bit ≥ 2.1** on the host that will run the export.
+- You can install either **Logstash ≥ 8.0** or **elasticdump ≥ 6.0** on the host that will run the export.
 
 
 ## Introduction
 
 Exporting logs is a common need when you want to analyse data outside the LDP ecosystem or feed it to external BI tools. For long-term archiving, we provide [another solution](/pages/manage_and_operate/observability/logs_data_platform/archive_cold_storage/).
-The next sections explain how to pull documents from your alias with **Logstash** or with **Fluent Bit**, letting you choose the tool that best fits your operational model.
+The next sections explain how to pull documents from your alias with **Logstash** or with the **elasticdump** CLI, letting you choose the tool that best fits your operational model.
 
 
 ## Alias naming conventions
@@ -139,112 +139,134 @@ bin/logstash -f config/pipeline.conf --config.reload.automatic
 
 Logstash will connect to the OpenSearch endpoint, read the documents that belong to the alias defined above, and write the selected fields to a daily CSV file under `/var/log/ldp/`.
 
-## Export logs with Fluent Bit
+## Export logs with elasticdump
 
 ### Prerequisites
 
 | Requirement | Details |
 |-------------|---------|
-| Fluent Bit ≥ 2.1 | Install on a Linux host or container with network access to the LDP endpoint. |
+| elasticdump ≥ 6.0 | Install on a host that can reach your LDP cluster over HTTPS. |
+| Node.js runtime | elasticdump is a Node.js CLI; install Node.js 18 LTS or later. |
 | Network access | Allow outbound TCP connectivity to `<ldp-cluster>.logs.ovh.com` on port `9200`. |
 | Authentication | Use either basic auth credentials (legacy users) or an IAM bearer token. |
-| TLS trust store | Ensure the system trust store contains public Certificate Authorities, or provide a custom CA bundle. |
+| TLS trust store | Ensure the system trust store contains public Certificate Authorities, or supply a CA bundle with `--input-ca`. |
 | Alias name | The alias created earlier (e.g. `ldp-ti-98765-a-logs-export`). |
 
-### Install Fluent Bit locally
+### Install elasticdump
 
 ```bash
-# Example for Debian/Ubuntu
-curl https://repos.fluentbit.io/fluentbit.key | sudo gpg --dearmor -o /usr/share/keyrings/fluentbit-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/fluentbit-archive-keyring.gpg] https://packages.fluentbit.io/ubuntu/$(lsb_release -sc) $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/fluentbit.list
+# Install Node.js using your preferred method (example for Debian/Ubuntu)
 sudo apt update
-sudo apt install fluent-bit
+sudo apt install nodejs npm
 
-# Verify version
-fluent-bit --version
+# Install elasticdump globally
+sudo npm install -g elasticdump
+
+# Validate the installation
+elasticdump --version
 ```
 
-If you use a container image, ensure the container has access to `/etc/ssl/certs/` or mount a directory that contains trusted CAs to validate the OVHcloud certificate chain.
+For air-gapped or containerised environments, you can download the [official Docker image](https://hub.docker.com/r/taskrabbit/elasticsearch-dump) and run the same commands with `docker run --rm -v "$PWD":/work -w /work taskrabbit/elasticsearch-dump …`.
 
-### Fluent Bit configuration
+### Authenticate to the Logs Data Platform
 
-Create `/etc/fluent-bit/fluent-bit.conf` with the following content:
+elasticdump relies on HTTP headers for authentication. Choose the method that matches your account:
 
-```ini
-[SERVICE]
-    Flush        1
-    Grace        30
-    Log_Level    info
-    storage.path /var/lib/fluent-bit/
+* **Basic authentication** — append credentials in the URL: `https://<username>:<password>@<ldp-cluster>.logs.ovh.com:9200/<alias>`.
+* **IAM bearer token** — add an `Authorization` header: `--input-headers '{"Authorization":"Bearer <iam-token>"}'`.
 
-[INPUT]
-    Name                elasticsearch
-    Host                <ldp-cluster>.logs.ovh.com
-    Port                9200
-    Index               <alias-name>
-    Query               {"query":{"bool":{"filter":[{"range":{"@timestamp":{"gte":"now-1d","lte":"now"}}}]}}}
-    Scroll              5m
-    Interval_Sec        300
-    tls                 On
-    tls.verify          On
-    tls.ca_file         /etc/ssl/certs/ca-certificates.crt
-    HTTP_User           <username>
-    HTTP_Passwd         <password>
+When using IAM tokens, leave the credentials out of the URL and rely solely on the header. Tokens are short-lived; plan to refresh them before launching long exports.
 
-# --- Use this block instead of HTTP_User/HTTP_Passwd when authenticating with IAM ---
-#[INPUT]
-#    Name                elasticsearch
-#    Host                <ldp-cluster>.logs.ovh.com
-#    Port                9200
-#    Index               <alias-name>
-#    Query               {"query":{"match_all":{}}}
-#    Scroll              5m
-#    Interval_Sec        300
-#    tls                 On
-#    tls.verify          On
-#    Header              Authorization Bearer <iam-token>
+### Export an alias to JSON
 
-[OUTPUT]
-    Name        file
-    Match       *
-    Path        /var/log/ldp/
-    File        fluentbit-export
-    Format      json
-    Rotate_Wait 60
-    Total_File_Size 512M
+Create a JSON file (`search-body.json`) that defines your query. The example below retrieves events from the last 24 hours:
 
-#[OUTPUT]
-#    Name        forward
-#    Match       *
-#    Host        <central-collector>
-#    Port        24224
-#    tls         On
-#    tls.verify  On
+```json
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "now-24h",
+              "lte": "now"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "@timestamp": "asc"
+    }
+  ]
+}
 ```
 
-Start Fluent Bit with:
+Run elasticdump to export the documents:
 
 ```bash
-sudo systemctl restart fluent-bit
-# or run manually
-fluent-bit -c /etc/fluent-bit/fluent-bit.conf
+elasticdump \
+  --input https://<ldp-cluster>.logs.ovh.com:9200/<alias-name> \
+  --output ./ldp-export.json \
+  --searchBody @search-body.json \
+  --limit 500 \
+  --type data
 ```
 
-### Understanding the key options
+To authenticate with IAM, add the header flag:
 
-- **Pagination (`Scroll`)**: The `Scroll` directive keeps a server-side cursor active for batch extraction. Keep it long enough (e.g. `5m`) to read all pages but short enough to release resources quickly.
-- **Query filters**: Adjust the `Query` JSON to limit the time range (`range` filter on `@timestamp`) or to apply additional `bool` conditions (e.g., `term` filters). Narrow queries reduce the number of documents and speed up exports.
-- **Interval scheduling**: `Interval_Sec` defines how often Fluent Bit will rerun the query. Align it with your retention policy (e.g., run every 5 minutes or once per day).
-- **Buffering and storage**: The `[SERVICE]` section enables filesystem buffering (`storage.path`). Tune `storage.backlog.mem_limit` and output-specific buffering options if you expect spikes in document volume.
-- **TLS verification**: Keep `tls.verify On` to ensure the connection validates the OVHcloud certificate chain. Only disable verification for troubleshooting and re-enable it afterward.
-- **Output routing**: The provided `[OUTPUT]` section writes newline-delimited JSON files and rotates them every 60 seconds or 512 MB. Replace or complement it with other plugins (`forward`, `http`, `kafka`, etc.) to relay the extracted documents to downstream systems.
+```bash
+elasticdump \
+  --input https://<ldp-cluster>.logs.ovh.com:9200/<alias-name> \
+  --input-headers '{"Authorization":"Bearer <iam-token>"}' \
+  --output ./ldp-export.json \
+  --searchBody @search-body.json \
+  --limit 500 \
+  --type data
+```
+
+elasticdump streams the results to `ldp-export.json` in newline-delimited JSON format, which can be loaded into analytics tools or archived for compliance.
+
+### Handle pagination and large time ranges
+
+elasticdump paginates results automatically using the OpenSearch scroll API. Tune the export with the following options:
+
+* `--limit <n>` controls how many documents elasticdump pulls per batch. Reduce the value (e.g. `200`) if you experience timeouts.
+* `--maxSockets <n>` adjusts the number of concurrent HTTP connections. Set it to `1` for strict rate limiting or increase it to accelerate exports on aliases with high throughput.
+* `--input-parameters '{"scroll":"10m"}'` extends the server-side cursor to 10 minutes, useful for large datasets.
+
+To export specific time windows, modify `search-body.json` with a `range` filter and run several commands in sequence:
+
+```bash
+elasticdump --input https://<cluster>/<alias> \
+  --output ./ldp-2024-05-01.json \
+  --searchBody '{"query":{"range":{"@timestamp":{"gte":"2024-05-01","lt":"2024-05-02"}}}}'
+
+elasticdump --input https://<cluster>/<alias> \
+  --output ./ldp-2024-05-02.json \
+  --searchBody '{"query":{"range":{"@timestamp":{"gte":"2024-05-02","lt":"2024-05-03"}}}}'
+```
+
+The `--transform` flag lets you adjust each document before writing it to disk. For example, to remove the `_id` field:
+
+```bash
+elasticdump --input https://<cluster>/<alias> \
+  --output ./ldp.json \
+  --searchBody @search-body.json \
+  --transform 'delete doc._id; return doc;'
+```
+
+Combine these filters with cron jobs or orchestration tools to automate recurring exports.
 
 ## Next steps
 
 * **Extend the Logstash pipeline** with additional filters (`grok`, `geoip`, `mutate`) or different outputs to match your analytics workflow.
-* **Adapt the Fluent Bit configuration** to forward data to a centralized collector (e.g., Fluentd, Kafka, HTTP) or to adjust the extraction schedule.
+* **Automate elasticdump runs** with cron, systemd timers, or CI/CD pipelines and move the exported files to object storage for long-term retention.
 * **Automate credential renewal** when using IAM bearer tokens by integrating with the OVHcloud IAM API and rotating tokens before they expire.
 
 For more details on the OpenSearch input plugin, see the official documentation: <https://docs.opensearch.org/latest/tools/logstash/read-from-opensearch/>.
 The CSV output plugin reference is available at: <https://www.elastic.co/guide/en/logstash/current/plugins-outputs-csv.html>.
-Fluent Bit configuration options are documented at: <https://docs.fluentbit.io/manual/pipeline/inputs/elasticsearch> and <https://docs.fluentbit.io/manual/pipeline/outputs>.
+elasticdump usage is documented at: <https://github.com/elasticsearch-dump/elasticsearch-dump>.
