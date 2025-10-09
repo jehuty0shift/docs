@@ -1,13 +1,21 @@
 ---
-title: Handling roles and permissions
+title: Handling roles and permissions when IAM is not enabled
 excerpt: Manage who can have access to your data and what they can do with them.
-updated: 2022-07-28
+updated: 2025-10-08
 ---
 
 ## Overview
 
 Logs policies are often decisions made by an entire team, not individuals. Collaboration remains an utmost priority for Logs Data Platform, following this strategy it shall enable everyone to share data in a easy and secure manner.
-Log policies also affect several teams regarding access rights, for instance the Product managers can access some data but be denied to access security logs. That's why we decided to provide a [Role Based Access Control](https://en.wikipedia.org/wiki/Role-based_access_control) to users to configure access rights. This document will expose you how you can use this system to configure access rights.
+Log policies also affect several teams regarding access rights, for instance the Product managers can access some data but be denied to access security logs. 
+
+> [!warning]
+> Logs Data Platform fully supports [Access management through IAM](/pages/manage_and_operate/observability/logs_data_platform/iam_access_management).
+> The feature presented in this documentation is for "legacy users" and not for IAM enabled account.
+> We strongly advise to use IAM and not use the content of this guide for new Logs Data Platform services.  
+
+
+We maintain the [Role Based Access Control](https://en.wikipedia.org/wiki/Role-based_access_control) to allow users to configure access rights if they cannot yet enable IAM. This document will expose you how you can use this system to configure access rights. However as stated just above, this feature will not be upgraded and is bound to be fully replaced by IAM access management. 
 
 ## Creating a Role
 

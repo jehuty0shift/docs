@@ -18,11 +18,6 @@ details[open]>summary::before {
 }
 </style>
 
-> [!primary]
-> IAM for Logs Data Platform will be available starting **17th September 2025**.
-> The content of this documentation will be valid from this date.
->
-
 ## Overview
 
 This guide provides instructions for configuring access rights on OVHcloud IAM to manage permissions for various components of Logs Data Platform. It will give you the best practices to handle the rights given to your users and will ensure that you can replicate the functionality of roles and permissions with the more advanced system of policies. This guide will use features explained in the [IAM documentation](/pages/account_and_service_management/account_information/iam-policy-ui). It is therefore recommended to read it before reading this guide. 

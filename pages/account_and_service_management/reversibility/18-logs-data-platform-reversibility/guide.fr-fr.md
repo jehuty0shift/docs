@@ -1,11 +1,11 @@
 ---
-title: "Politique de réversibilité du produit Managed Log Manager"
+title: "Politique de réversibilité du produit Logs Data Platform"
 updated: 2025-07-08
 ---
 
 ## Objectif
 
-Ce document est la politique de réversibilité du produit Managed Log Manager couvrant l’offre commerciale Logs Data Platform d’OVHcloud.
+Ce document est la politique de réversibilité du produit Logs Data Platform couvrant l’offre commerciale Logs Data Platform d’OVHcloud.
 
 Cette politique vise à mettre en œuvre les principes généraux de réversibilité et notre conformité avec le Code de conduite SWIPO IaaS pour les fournisseurs de cloud.
 

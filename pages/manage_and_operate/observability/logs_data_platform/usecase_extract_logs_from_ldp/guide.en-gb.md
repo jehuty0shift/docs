@@ -141,7 +141,7 @@ Logstash will connect to the OpenSearch endpoint, read the documents that belong
 
 ### Install elasticdump
 
-Installing Fluent Bit can be done in several ways as explained in the [documentation.](https://docs.fluentbit.io/manual/installation/getting-started-with-fluent-bit)
+[Elasticdump](https://github.com/elasticsearch-dump/elasticsearch-dump) is an opensource software designed to export data from ElasticSearch/OpenSearch to a file or to another OpenSearch/ElasticSearch. It's a great tool to migrate from ElasticSearch to OpenSearch and to download data contained in your aliases or indices. It is written in Javascript and thus relies on a javascript runtime to run.
 
 ```bash
 # Install Node.js using your preferred method (example for Debian/Ubuntu)
@@ -149,13 +149,13 @@ sudo apt update
 sudo apt install nodejs npm
 
 # Install elasticdump globally
-sudo npm install -g elasticdump
+npm install -g elasticdump
 
 # Validate the installation
 elasticdump --version
 ```
 
-For air-gapped or containerised environments, you can download the [official Docker image](https://hub.docker.com/r/taskrabbit/elasticsearch-dump) and run the same commands with `docker run --rm -v "$PWD":/work -w /work taskrabbit/elasticsearch-dump …`.
+For air-gapped or containerised environments, you can download the [official Docker image](https://hub.docker.com/r/elasticdump/elasticsearch-dump) and run the same commands with `docker run --rm -v "$PWD":/work -w /work elasticdump/elasticsearch-dump`.
 
 ### Authenticate to the Logs Data Platform
 
@@ -177,7 +177,7 @@ Create a JSON file (`search-body.json`) that defines your query. The example bel
       "filter": [
         {
           "range": {
-            "@timestamp": {
+            "timestamp": {
               "gte": "now-24h",
               "lte": "now"
             }
@@ -188,7 +188,7 @@ Create a JSON file (`search-body.json`) that defines your query. The example bel
   },
   "sort": [
     {
-      "@timestamp": "asc"
+      "timestamp": "asc"
     }
   ]
 }
@@ -198,14 +198,14 @@ Run elasticdump to export the documents:
 
 ```bash
 elasticdump \
-  --input https://<ldp-cluster>.logs.ovh.com:9200/<alias-name> \
+  --input https://<user>:<password>@<ldp-cluster>.logs.ovh.com:9200/<alias-name> \
   --output ./ldp-export.json \
   --searchBody @search-body.json \
-  --limit 500 \
+  --limit 1000 \
   --type data
 ```
 
-To authenticate with IAM, add the header flag:
+To authenticate with IAM, you can use the header flag or the hybrid authentication:
 
 ```bash
 elasticdump \
@@ -213,13 +213,42 @@ elasticdump \
   --input-headers '{"Authorization":"Bearer <iam-token>"}' \
   --output ./ldp-export.json \
   --searchBody @search-body.json \
-  --limit 500 \
   --type data
 ```
 
+```bash
+elasticdump \
+  --input https://pat_jwt_<any_string_here>:<iam-oken>@<ldp-cluster>.logs.ovh.com:9200/<alias-name> \
+  --output ./ldp-export.json \
+  --searchBody @search-body.json \
+  --type data
+```
+
+
+
 elasticdump streams the results to `ldp-export.json` in newline-delimited JSON format, which can be loaded into analytics tools or archived for compliance.
 
-### Handle pagination and large time ranges
+```bash
+$ elasticdump --input https://<user>:<password>@gra2.logs.ovh.com:9200/<alias-name> --output ./ldp-export.json --searchBody @search-body.json --limit 500 --type data
+Tue, 07 Oct 2025 14:11:30 GMT | starting dump
+Tue, 07 Oct 2025 14:11:30 GMT | got 79 objects from source elasticsearch (offset: 0)
+Tue, 07 Oct 2025 14:11:30 GMT | sent 79 objects, 0 offset, to destination file, wrote 79
+Tue, 07 Oct 2025 14:11:30 GMT | got 0 objects from source elasticsearch (offset: 500)
+Tue, 07 Oct 2025 14:11:30 GMT | Total Writes: 79
+Tue, 07 Oct 2025 14:11:30 GMT | dump complete
+```
+
+### Handle formats, pagination and large time ranges
+
+To export data in CSV format use the csv scheme in the output file:
+
+```bash
+elasticdump \
+  --input https://pat_jwt_<any_string_here>:<iam-oken>@<ldp-cluster>.logs.ovh.com:9200/<alias-name> \
+  --output csv://./ldp-export.json \
+  --searchBody @search-body.json \
+  --type data
+```
 
 elasticdump paginates results automatically using the OpenSearch scroll API. Tune the export with the following options:
 
@@ -230,13 +259,13 @@ elasticdump paginates results automatically using the OpenSearch scroll API. Tun
 To export specific time windows, modify `search-body.json` with a `range` filter and run several commands in sequence:
 
 ```bash
-elasticdump --input https://<cluster>/<alias> \
+elasticdump --input https://<user>:<password>@<cluster>/<alias> \
   --output ./ldp-2024-05-01.json \
-  --searchBody '{"query":{"range":{"@timestamp":{"gte":"2024-05-01","lt":"2024-05-02"}}}}'
+  --searchBody '{"query":{"range":{"timestamp":{"gte":"2024-05-01","lt":"2024-05-02"}}}}'
 
-elasticdump --input https://<cluster>/<alias> \
+elasticdump --input https://<user>:<password>@<cluster>/<alias> \
   --output ./ldp-2024-05-02.json \
-  --searchBody '{"query":{"range":{"@timestamp":{"gte":"2024-05-02","lt":"2024-05-03"}}}}'
+  --searchBody '{"query":{"range":{"timestamp":{"gte":"2024-05-02","lt":"2024-05-03"}}}}'
 ```
 
 The `--transform` flag lets you adjust each document before writing it to disk. For example, to remove the `_id` field:
@@ -248,14 +277,8 @@ elasticdump --input https://<cluster>/<alias> \
   --transform 'delete doc._id; return doc;'
 ```
 
-Combine these filters with cron jobs or orchestration tools to automate recurring exports.
 
-## Next steps
-
-* **Extend the Logstash pipeline** with additional filters (`grok`, `geoip`, `mutate`) or different outputs to match your analytics workflow.
-* **Automate elasticdump runs** with cron, systemd timers, or CI/CD pipelines and move the exported files to object storage for long-term retention.
-* **Automate credential renewal** when using IAM bearer tokens by integrating with the OVHcloud IAM API and rotating tokens before they expire.
-
+## More
 For more details on the OpenSearch input plugin, see the official documentation: <https://docs.opensearch.org/latest/tools/logstash/read-from-opensearch/>.
 The CSV output plugin reference is available at: <https://www.elastic.co/guide/en/logstash/current/plugins-outputs-csv.html>.
 elasticdump usage is documented at: <https://github.com/elasticsearch-dump/elasticsearch-dump>.

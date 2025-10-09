@@ -1,7 +1,7 @@
 ---
 title: IAM for Logs Data Platform - Presentation and FAQ 
 excerpt: A presentation on how IAM works with Logs Data Platform
-updated: 2025-07-22
+updated: 2025-10-09
 ---
 
 > [!primary]
@@ -91,7 +91,7 @@ With IAM enabled, [tokens](/pages/manage_and_operate/observability/logs_data_pla
 For example if you are on gra1 cluster, curl can use these tokens in the following way:
 
 ```bash 
-ldp@laptop curl -k -v -H 'content-type: application/json' --oauth2-bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c  -XGET 'https://gra1.logs.ovh.com:9200/_cluster/health?pretty' 
+ldp@laptop curl -H 'content-type: application/json' --oauth2-bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c  -XGET 'https://gra1.logs.ovh.com:9200/_cluster/health?pretty'
 ```
 
 ### How to create indices or aliases on Logs Data Platform backend APIs?
