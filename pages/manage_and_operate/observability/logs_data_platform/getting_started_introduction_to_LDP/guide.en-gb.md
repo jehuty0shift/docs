@@ -1,7 +1,7 @@
 ---
 title: Introduction to Logs Data Platform
 excerpt: Discover what Logs Data Platform is and how it works
-updated: 2025-05-06
+updated: 2025-10-10
 ---
 
 ## Objective
@@ -24,7 +24,7 @@ The goal of this documentation is:
 - to introduce the core concepts and key vocabulary.
 - to describe how Logs Data Platform ingests, stores and exposes your logs.
 
-After reading this documentation, you can read the [Quick start](/pages/manage_and_operate/observability/logs_data_platform/getting_started_quick_start) documentation to configure your account and send your first logs to Logs Data Platform.
+After reading this documentation, you can read the [Quick start](/pages/manage_and_operate/observability/logs_data_platform/getting_started_quick_start) documentation to configure your service and send your first logs to Logs Data Platform.
 
 ## The Lifecycle of Logs
 
@@ -46,9 +46,9 @@ Before giving you more details on how Logs Data Platform handles each of these p
 
 - **OVHcloud Account**: The *OVHcloud account* is the highest-level tenancy level, not specific to Logs Data Platform.
 
-- **Logs Data Platform Account**: A *Logs Data Platform Account* is the highest-level tenancy level specific to Logs Data Platform. Every Logs Data Platform account is associated to an OVHcloud account like any other OVHcloud service.<br>
-For the remainder of this guide and others and unless specified otherwise, the word *Account* will refer to a Logs Data Platform account. Different accounts associated with the same OVHcloud account are treated exactly as if they were associated with different OVHcloud accounts. It is at the account level that you will manage groups of users, permissions, subscriptions to options (such as dashboards, dedicated inputs etc...) and create streams (see next point).<br>
-A Logs Data Platform account has a unique identifier that looks like `ldp-[a-z]^2-[0-9]^5`, for example *ldp-xy-98765* and is associated with a unique username `logs-[a-z]^2-[0-9]^5`, for example *logs-ab-12345* (be careful, the chains of characters are not the same for Logs Data Platform account and username).<br>
+- **Logs Data Platform Service**: A *Logs Data Platform Service* is the highest-level tenancy level specific to Logs Data Platform. Every Logs Data Platform Service is associated to an OVHcloud account like any other OVHcloud service.<br>
+For the remainder of this guide and others and unless specified otherwise, the word *Service* will refer to a Logs Data Platform service. Different services associated with the same OVHcloud account are treated exactly as if they were associated with different OVHcloud accounts. It is at the account level that you will manage groups of users, permissions, subscriptions to options (such as dashboards, dedicated inputs etc...) and create streams (see next point).<br>
+A Logs Data Platform service has a unique identifier that looks like `ldp-[a-z]^2-[0-9]^5`, for example *ldp-xy-98765* and is associated with a unique username `logs-[a-z]^2-[0-9]^5`, for example *logs-ab-12345* (be careful, the chains of characters are not the same for Logs Data Platform service and username).<br>
 This username is associated with a password that you will have to configure via the OVHcloud Control Panel or via the API before using your cluster. The corresponding user is the administrator of the cluster. The usage of Logs Data Platform's RBAC model is described in [this guide](/pages/manage_and_operate/observability/logs_data_platform/getting_started_roles_permission).
 
 - **Stream**: A Logs Data Platform *Stream* is a logical partition of logs that you create and that you will use when ingesting, storing, visualizing or querying your logs.<br>
@@ -73,7 +73,7 @@ To do that, you will have to configure your SDK or logs-collecting software to f
 
 ### Mutualized inputs
 
-By default, Logs Data Platform exposes inputs that can ingest your logs in different formats (Gelf, LTSV, RFC 5424, Cap'n'Proto and Beats). To use them, you will have to configure your SDK or software to target an endpoint that is assigned to your Logs Data Platform account with a specific port, depending on the logs format that you use and on whether you send them over UDP, TCP, or TCP/TLS (encrypted on the network) and add a custom field to your logs corresponding to the token of the Stream that you want to push your logs to. 
+By default, Logs Data Platform exposes inputs that can ingest your logs in different formats (Gelf, LTSV, RFC 5424, Cap'n'Proto and Beats). To use them, you will have to configure your SDK or software to target an endpoint that is assigned to your Logs Data Platform service with a specific port, depending on the logs format that you use and on whether you send them over UDP, TCP, or TCP/TLS (encrypted on the network) and add a custom field to your logs corresponding to the token of the Stream that you want to push your logs to. 
 
 Our inputs will match the token with the target stream, verify the validity of some fields as well as convert your logs to the Gelf format before storing them in our platform. 
 
@@ -129,11 +129,11 @@ Now that you have seen how your logs are ingested and stored, let us look at how
 
 ### Graylog 
 
-Logs Data Platform comes with a managed Graylog platform that you can access as you wish with the credentials from your Logs Data Platform account. If you are not familiar with it, Graylog is a web-based UI that allows you to query your logs and build dashboards to have a graphical representation of your logs. The Graylog API is also exposed.
+Logs Data Platform comes with a managed Graylog platform that you can access as you wish with the credentials from your Logs Data Platform service. If you are not familiar with it, Graylog is a web-based UI that allows you to query your logs and build dashboards to have a graphical representation of your logs. The Graylog API is also exposed.
 
 ### OpenSearch API
 
-Many softwares interact directly with the OpenSearch API. The OpenSearch API is available behind port *9200* of the cluster you are assigned to. Since most OpenSearch API calls need an *Index* as a parameter, you must use an *Alias* that matches a set of streams and indices from your Logs Data Platform account or directly an *Index* if you have subscribed to one.
+Many softwares interact directly with the OpenSearch API. The OpenSearch API is available behind port *9200* of the cluster you are assigned to. Since most OpenSearch API calls need an *Index* as a parameter, you must use an *Alias* that matches a set of streams and indices from your Logs Data Platform service or directly an *Index* if you have subscribed to one.
 
 ### OpenSearch Dashboards (Kibana alternative)
 
@@ -163,4 +163,4 @@ To help you visualize the information of this guide, the picture below should su
 
 ## Go Further
 
-After reading this documentation, you should be familiar with most concepts used in Logs Data Platform. When you feel ready to work with Logs Data Platform, jump to the [Quick Start guide](/pages/manage_and_operate/observability/logs_data_platform/getting_started_quick_start) to configure your account, create a first stream, send your first logs to Logs Data Platform and watch it appear on Graylog!
+After reading this documentation, you should be familiar with most concepts used in Logs Data Platform. When you feel ready to work with Logs Data Platform, jump to the [Quick Start guide](/pages/manage_and_operate/observability/logs_data_platform/getting_started_quick_start) to configure your service, create a first stream, send your first logs to Logs Data Platform and watch it appear on Graylog!

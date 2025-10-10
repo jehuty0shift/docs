@@ -130,6 +130,17 @@ These tokens do not expire but can be deleted whenever needed with this call
 > @api {v1} /me DELETE /me/identity/user/{user}/token/{name}
 >
 
+#### Hybrid authentication
+
+For software that does not support the Bearer authentication scheme, we provide a hybrid authentication mode based on the Basic authentication scheme. Use a username that starts with **pat_jwt_** and supply the token value as the password.
+
+```bash
+ldp@laptop curl -H 'content-type: application/json' \\
+  -u pat_jwt_<your_username>:<access_token> \\
+  -XPUT 'https://<your_cluster>.logs.ovh.com:9200/_cat/indices/ldp-*'
+```
+
+
 ### Legacy tokens
 
 
